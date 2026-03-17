@@ -1,0 +1,27 @@
+# audio
+data/temp_*.wav
+data/*.wav
+
+# database
+data/*.db
+
+# chromadb index
+data/chroma_db/
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# mlx cache
+.cache/
+mlx_models/
+
+# mac
+.DS_Store
+
+# env
+.env
