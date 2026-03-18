@@ -1,12 +1,18 @@
-# core/brain.py — SAMEER AI TWIN — Layer 1 + 2 complete
+# core/brain.py — SAMEER AI TWIN — dual model: 7B text + 3B voice
 import streamlit as st
 from mlx_lm import load, generate
 
 
 @st.cache_resource
 def _load_model():
-    print("Loading Qwen2.5-14B... first run takes 2-3 min")
-    return load("mlx-community/Qwen2.5-14B-Instruct-4bit")
+    print("Loading Qwen2.5-7B for text... first run takes 1-2 min")
+    return load("mlx-community/Qwen2.5-7B-Instruct-4bit")
+
+
+@st.cache_resource
+def _load_fast_model():
+    print("Loading Qwen2.5-3B for voice... first run takes 1 min")
+    return load("mlx-community/Qwen2.5-3B-Instruct-4bit")
 
 
 FULL_SYSTEM_PROMPT = """You are SAMEER AI — Sameer's personal AI operator and second brain.
@@ -24,7 +30,8 @@ SAMEER'S EXACT SETUP — NEVER DEVIATE
 - MacBook Apple Silicon (M-series)
 - Project: ~/Desktop/sameer-ai-twin
 - Installed: streamlit, mlx-lm, mlx-audio, sounddevice, soundfile, numpy
-- LLM: Qwen2.5-14B-Instruct-4bit via mlx_lm
+- LLM text: Qwen2.5-7B-Instruct-4bit via mlx_lm
+- LLM voice: Qwen2.5-3B-Instruct-4bit via mlx_lm
 - STT: whisper-large-v3-turbo via mlx-audio
 - TTS: Kokoro-82M via mlx-audio
 - DB: SQLite
@@ -59,6 +66,16 @@ If you suggest RAG, LlamaIndex, ChromaDB, or voice setup as next steps
 you are WRONG. These are already built. Do not mention them as todos.
 
 ════════════════════════════════════════
+WHAT TO BUILD NEXT — ONLY SUGGEST THESE
+════════════════════════════════════════
+- Layer 5: Mac automation via AppleScript
+- Layer 6: Proactive intelligence — cron jobs, hourly nudges, morning briefing
+- Layer 7: Personality engine — Hinglish mode, tone adaptation
+- Layer 8: Always-listening hotword detection
+- Layer 9: Telegram bot for mobile access
+- Layer 10: Hybrid intelligence — local + external LLM routing
+
+════════════════════════════════════════
 CRITICAL HONESTY RULE
 ════════════════════════════════════════
 NEVER say "based on your notes" or "you have knowledge about X"
@@ -69,75 +86,7 @@ If no notes are provided about a topic:
 - Never invent what Sameer knows
 - Never pretend he has studied something
 - Say clearly: "You don't have notes on this yet."
-- Then answer from general knowledge if helpful, but never mix it with his personal notes.
-
-════════════════════════════════════════
-WHAT TO BUILD NEXT — ONLY SUGGEST THESE
-════════════════════════════════════════
-- Layer 5: Mac automation via AppleScript
-- Layer 6: Proactive intelligence — cron jobs, hourly nudges, morning briefing
-- Layer 7: Personality engine — Hinglish mode, tone adaptation
-- Layer 8: Always-listening hotword detection
-- Layer 9: Telegram bot for mobile access
-- Layer 10: Hybrid intelligence — local + external LLM routing
-
-
-════════════════════════════════════════
-CURRENT CORRECT API SYNTAX (use exactly)
-════════════════════════════════════════
-
-LLAMAINDEX + CHROMADB (Phase 2):
-from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, StorageContext
-from llama_index.vector_stores.chroma import ChromaVectorStore
-import chromadb
-
-client = chromadb.PersistentClient(path="data/chroma_db")
-collection = client.get_or_create_collection("sameer_knowledge")
-vector_store = ChromaVectorStore(chroma_collection=collection)
-storage_context = StorageContext.from_defaults(vector_store=vector_store)
-index = VectorStoreIndex.from_documents(documents, storage_context=storage_context)
-index = VectorStoreIndex.from_vector_store(vector_store)
-engine = index.as_query_engine()
-response = engine.query("your question")
-
-MLX_LM:
-from mlx_lm import load, generate
-model, tokenizer = load("mlx-community/Qwen2.5-14B-Instruct-4bit")
-response = generate(model, tokenizer, prompt, max_tokens=500)
-
-LANGGRAPH (Phase 3):
-from langgraph.graph import StateGraph, END
-from typing import TypedDict
-class State(TypedDict):
-    messages: list
-    next: str
-graph = StateGraph(State)
-graph.add_node("research", research_agent)
-graph.add_edge("research", END)
-graph.set_entry_point("research")
-app = graph.compile()
-
-STREAMLIT:
-@st.cache_resource
-st.spinner("text")
-st.rerun()
-st.audio(path, format="audio/wav", autoplay=True)
-
-SQLITE:
-conn = sqlite3.connect("data/sameer_ai.db", check_same_thread=False)
-
-════════════════════════════════════════
-BANNED — NEVER SUGGEST THESE
-════════════════════════════════════════
-- GPTVectorStoreIndex (LlamaIndex v1 — dead)
-- chromadb Client(Settings(chroma_db_impl=...)) — dead
-- from llama_index import ... (old v1 imports — dead)
-- load_index_from_storage for ChromaDB queries
-- PyTorch, Hugging Face training, fine-tuning
-- facebook/rag-token-nq
-- Cloud APIs, OpenAI API, internet-dependent tools
-- New virtual environments
-- pip install transformers datasets torch
+- Then answer from general knowledge if helpful
 
 ════════════════════════════════════════
 LIVE CONTEXT (updated every call)
@@ -198,7 +147,6 @@ If user asks WHAT TO DO or needs PRIORITIZATION:
 
 If user is just CHATTING or checking in:
 → Respond naturally like a smart friend. No format needed.
-
 """
 
 
@@ -226,7 +174,7 @@ NEXT TO BUILD:
 STRICT VOICE RULES:
 - Maximum 2 sentences. Never more.
 - Zero bullet points, zero formatting, zero code.
-- Sound like a smart friend talking naturally.
+- Sound exactly like a smart friend talking naturally.
 - End with one clear action Sameer can take right now.
 - Never suggest anything from the ALREADY BUILT list above.
 """
@@ -240,7 +188,11 @@ def get_response(
 
     from core.memory import log_event, get_context_summary
 
-    model, tokenizer = _load_model()
+    # Use fast 3B for voice, full 7B for text
+    if voice_mode:
+        model, tokenizer = _load_fast_model()
+    else:
+        model, tokenizer = _load_model()
 
     # Layer 2 — full context engine
     recent_activity = get_context_summary()
@@ -254,7 +206,7 @@ def get_response(
         recent_activity=recent_activity
     )
 
-    # Layer 3 — RAG knowledge base (activates automatically when v2 is built)
+    # Layer 3 — RAG knowledge base
     try:
         from knowledge.retriever import query as knowledge_query
         knowledge_context = knowledge_query(user_message)
@@ -265,7 +217,7 @@ def get_response(
     except Exception:
         pass
 
-    # Log this query to memory
+    # Log this query
     log_event("query", user_message[:200])
 
     messages = [
@@ -279,7 +231,8 @@ def get_response(
         add_generation_prompt=True
     )
 
-    max_tokens = 150 if voice_mode else 500
+    # 3B voice needs fewer tokens — faster response
+    max_tokens = 80 if voice_mode else 400
 
     try:
         response = generate(model, tokenizer, prompt, max_tokens=max_tokens)
