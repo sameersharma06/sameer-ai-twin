@@ -1,6 +1,7 @@
 # app.py — SAMEER AI TWIN v1 — Layer 2 complete
 import streamlit as st
 import datetime
+from agents.router import run_agents
 from core.tasks import get_tasks, add_task, mark_done
 from core.brain import get_response
 from core.voice import record_audio, transcribe, speak
@@ -97,8 +98,7 @@ st.divider()
 
 user_text = st.text_input("Or type here...")
 if user_text:
-    tasks_text = "\n".join([f"- {t[1]} ({t[2]})" for t in get_tasks()])
     with st.spinner("Thinking..."):
-        reply = get_response(user_text, tasks_text)
+        reply, agent_used = run_agents(user_text)
+    st.caption(f"Agent: {agent_used}")
     st.write("**Sameer AI:**", reply)
-    
