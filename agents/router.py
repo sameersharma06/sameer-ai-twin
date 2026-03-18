@@ -25,8 +25,11 @@ def detect_intent(text: str) -> str:
         "i am stuck", "feeling lost", "guide me"
     ]
     research_words = [
-        "what is", "explain", "research", "find", "search",
-        "tell me about", "what do my notes", "how does", "summarize"
+    "what is", "explain", "research", "find", "search",
+    "tell me about", "what do my notes", "how does", "summarize",
+    "how do i", "how do you", "what are", "describe",
+    "what do i know", "what do i have", "do i have notes",
+    "what have i learned", "what do my notes say"
     ]
     coding_words = [
         "code", "write a function", "debug", "fix this error",

@@ -8,9 +8,11 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
 CHROMA_PATH = "data/chroma_db"
 
-# Fully local — no OpenAI, no internet
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 Settings.llm = None
+
+# Minimum similarity score — below this we say "no relevant notes found"
+SIMILARITY_THRESHOLD = 0.5
 
 
 def query(question: str) -> str:
@@ -27,16 +29,23 @@ def query(question: str) -> str:
         vector_store = ChromaVectorStore(chroma_collection=collection)
         index        = VectorStoreIndex.from_vector_store(vector_store)
 
-        # Retrieve directly — no LLM needed
-        retriever = VectorIndexRetriever(index=index, similarity_top_k=1)
-        nodes     = retriever.retrieve(question)
+        retriever = VectorIndexRetriever(
+            index=index,
+            similarity_top_k=1
+        )
+        nodes = retriever.retrieve(question)
 
         if not nodes:
             return "empty"
 
-        # Combine top results into one context string
-        result = "\n\n".join([node.text for node in nodes])
-        return result.strip()
+        # Check similarity score — reject irrelevant results
+        top_node = nodes[0]
+        score = top_node.score if top_node.score is not None else 0
+
+        if score < SIMILARITY_THRESHOLD:
+            return "empty"
+
+        return top_node.text.strip()
 
     except Exception:
         return "empty"

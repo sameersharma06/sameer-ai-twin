@@ -15,11 +15,14 @@ def run(user_input: str) -> str:
     except Exception:
         pass
 
-    # Fall back to LLM
+    # Nothing in notes — answer from training data honestly
     prompt = f"""Research request: {user_input}
 
-Provide a clear, concise summary of what you know about this topic.
-Focus on practical, actionable information.
-If this relates to AI, coding, or tech — be specific and technical."""
+IMPORTANT: Only answer what you actually know.
+If this topic is not in Sameer's notes, say clearly:
+"I don't have notes on this yet. Here's what I know from general knowledge:"
+Then give a honest, accurate answer.
+Never pretend Sameer has knowledge he doesn't have.
+Never say "based on your notes" if there are no notes on this topic."""
 
     return get_response(prompt, voice_mode=False)
