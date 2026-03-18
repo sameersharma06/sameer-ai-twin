@@ -232,7 +232,7 @@ def get_response(
     )
 
     # 3B voice needs fewer tokens — faster response
-    max_tokens = 80 if voice_mode else 400
+    max_tokens = 80 if voice_mode else 600
 
     try:
         response = generate(model, tokenizer, prompt, max_tokens=max_tokens)

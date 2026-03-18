@@ -32,8 +32,29 @@ def transcribe(audio_path: str) -> str:
         audio=audio_path
     )
     text = result.text.strip()
+
+    # Catch empty transcription
     if not text:
-        raise ValueError("No speech detected. Speak louder and try again.")
+        raise ValueError("No speech detected. Please speak clearly and try again.")
+
+    # Catch Whisper hallucinations — repeated words or nonsense
+    words = text.split()
+    if len(words) > 3:
+        unique_words = set(w.lower() for w in words)
+        # If less than 20% unique words — it's hallucinating
+        if len(unique_words) / len(words) < 0.2:
+            raise ValueError("No clear speech detected. Please speak clearly and try again.")
+
+    # Catch known Whisper hallucination phrases
+    hallucination_phrases = [
+        "www.", "fema.gov", "thank you for watching",
+        "please subscribe", "visit our website",
+        "for more information"
+    ]
+    text_lower = text.lower()
+    if any(phrase in text_lower for phrase in hallucination_phrases):
+        raise ValueError("No clear speech detected. Please speak clearly and try again.")
+
     return text
 
 def speak(text: str) -> str:

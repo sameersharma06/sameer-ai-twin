@@ -1,4 +1,4 @@
-# app.py — SAMEER AI TWIN v1 — Layer 2 complete
+# app.py — SAMEER AI TWIN — fully updated
 import streamlit as st
 import datetime
 from agents.router import run_agents
@@ -43,7 +43,7 @@ with col2:
 with col3:
     st.subheader("💡 Daily Insight")
     if st.button("Get insight"):
-        tasks_text = "\n".join([f"- {t[1]} ({t[2]})" for t in get_tasks()])
+        tasks_text = "\n".join([f"- {t[1]} (due {t[2]})" for t in get_tasks()])
         with st.spinner("Thinking..."):
             insight = get_response(
                 "Give me one short powerful tip based on my tasks and recent activity.",
@@ -66,7 +66,7 @@ with col3:
 
 st.divider()
 
-if st.button("🎙️ Start Voice Conversation (8 sec)", type="primary", use_container_width=True):
+if st.button("🎙️ Start Voice Conversation (5 sec)", type="primary", use_container_width=True):
     try:
         with st.spinner("🎤 Listening... speak now"):
             audio_path = record_audio()
@@ -77,10 +77,28 @@ if st.button("🎙️ Start Voice Conversation (8 sec)", type="primary", use_con
         st.success(f"You said: **{user_said}**")
         log_event("voice_used", user_said[:100])
 
-        tasks_text = "\n".join([f"- {t[1]} ({t[2]})" for t in get_tasks()])
+        # Always fresh from database
+        tasks_text = "\n".join([f"- {t[1]} (due {t[2]})" for t in get_tasks()])
 
-        with st.spinner("🧠 Thinking..."):
-            reply = get_response(user_said, tasks_text, voice_mode=True)
+        # Detect task questions — answer directly from DB, skip LLM
+        task_trigger_words = [
+            "my tasks", "all tasks", "what tasks", "list tasks",
+            "show tasks", "pending tasks", "today's tasks",
+            "what are my", "tell me my tasks", "mere tasks",
+            "tasks batao", "kya tasks", "all my tasks"
+        ]
+        user_lower = user_said.lower()
+
+        if any(trigger in user_lower for trigger in task_trigger_words):
+            all_tasks = get_tasks()
+            if not all_tasks:
+                reply = "You have no pending tasks right now."
+            else:
+                task_lines = ", ".join([f"{t[1]}" for t in all_tasks])
+                reply = f"You have {len(all_tasks)} tasks: {task_lines}."
+        else:
+            with st.spinner("🧠 Thinking..."):
+                reply = get_response(user_said, tasks_text, voice_mode=True)
 
         st.write("**Sameer AI:**", reply)
 
@@ -98,7 +116,11 @@ st.divider()
 
 user_text = st.text_input("Or type here...")
 if user_text:
+    # Always fresh from database
+    tasks_text = "\n".join([f"- {t[1]} (due {t[2]})" for t in get_tasks()])
     with st.spinner("Thinking..."):
-        reply, agent_used = run_agents(user_text)
+        reply, agent_used = run_agents(user_text, tasks_text)
     st.caption(f"Agent: {agent_used}")
     st.write("**Sameer AI:**", reply)
+
+    

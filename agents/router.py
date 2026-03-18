@@ -5,6 +5,7 @@ from typing import TypedDict
 
 class AgentState(TypedDict):
     input: str
+    tasks: str
     output: str
     agent_used: str
 
@@ -25,7 +26,7 @@ def detect_intent(text: str) -> str:
         "i am stuck", "feeling lost", "guide me"
     ]
     research_words = [
-    "what is", "explain", "research", "find", "search",
+    "what is", "research", "find", "search",
     "tell me about", "what do my notes", "how does", "summarize",
     "how do i", "how do you", "what are", "describe",
     "what do i know", "what do i have", "do i have notes",
@@ -39,6 +40,16 @@ def detect_intent(text: str) -> str:
     automation_words = [
         "open", "launch", "automate", "notify",
         "remind", "close app", "start app"
+    ]
+    brain_words = [
+    "what should i", "what to do", "i have time",
+    "free time", "next step", "what's next",
+    "i don't know", "help me decide", "motivation",
+    "focus on", "prioritize", "should i build",
+    "what should i build", "where to start",
+    "i am stuck", "feeling lost", "guide me",
+    "explain the full", "explain my", "describe my",
+    "full architecture", "how does my", "overview of my"
     ]
 
     if any(w in text for w in task_words):
@@ -88,7 +99,7 @@ def automation_node(state: AgentState) -> AgentState:
 
 def brain_node(state: AgentState) -> AgentState:
     from core.brain import get_response
-    state["output"] = get_response(state["input"])
+    state["output"] = get_response(state["input"], state["tasks"])
     state["agent_used"] = "Brain"
     return state
 
@@ -126,12 +137,10 @@ def build_graph():
 agent_graph = build_graph()
 
 
-def run_agents(user_input: str) -> tuple[str, str]:
-    """
-    Returns (response, agent_name)
-    """
+def run_agents(user_input: str, tasks_text: str = "") -> tuple[str, str]:
     result = agent_graph.invoke({
         "input": user_input,
+        "tasks": tasks_text,
         "output": "",
         "agent_used": ""
     })
