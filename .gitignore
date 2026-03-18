@@ -24,4 +24,7 @@ mlx_models/
 .DS_Store
 
 # env
-.envtranscript.txt
+.env
+
+# transcript — never commit this
+transcript.txt
