@@ -28,7 +28,7 @@ def query(question: str) -> str:
         index        = VectorStoreIndex.from_vector_store(vector_store)
 
         # Retrieve directly — no LLM needed
-        retriever = VectorIndexRetriever(index=index, similarity_top_k=2)
+        retriever = VectorIndexRetriever(index=index, similarity_top_k=1)
         nodes     = retriever.retrieve(question)
 
         if not nodes:

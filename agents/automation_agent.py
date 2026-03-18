@@ -25,13 +25,16 @@ def run_applescript(script: str) -> str:
 
 
 def open_app(app_name: str) -> str:
-    # Safety check
     safe = any(safe.lower() in app_name.lower() for safe in SAFE_APPS)
     if not safe:
-        return f"'{app_name}' is not in the safe apps list. Add it manually first."
-    script = f'tell application "{app_name}" to activate'
-    log_event("automation", f"opened {app_name}")
-    return run_applescript(script)
+        return f"'{app_name}' is not in the safe apps list."
+    # use 'open' command — works even when app is closed
+    try:
+        subprocess.run(["open", "-a", app_name], check=True)
+        log_event("automation", f"opened {app_name}")
+        return f"Opened {app_name}."
+    except subprocess.CalledProcessError:
+        return f"Could not open {app_name}. Check the app name is exact."
 
 
 def show_notification(title: str, message: str) -> str:

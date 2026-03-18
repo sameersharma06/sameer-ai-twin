@@ -37,8 +37,37 @@ sameer-ai-twin/
 ├── app.py
 ├── core/brain.py, voice.py, tasks.py, memory.py
 ├── knowledge/ingestor.py, retriever.py
-├── agents/
+├── agents/router.py, task_agent.py, research_agent.py, coding_agent.py, automation_agent.py
 └── data/
+
+════════════════════════════════════════
+COMPLETED — NEVER MENTION THESE AGAIN
+════════════════════════════════════════
+These are 100% done. Never suggest them. Never recommend them.
+If Sameer asks what to build — skip these completely.
+
+- RAG with LlamaIndex + ChromaDB — FULLY DONE AND WORKING
+- LlamaIndex integration — FULLY DONE AND WORKING
+- ChromaDB vector store — FULLY DONE AND WORKING
+- Voice pipeline (Whisper + Kokoro) — FULLY DONE AND WORKING
+- Task manager with SQLite — FULLY DONE AND WORKING
+- Memory + Context Engine — FULLY DONE AND WORKING
+- LangGraph multi-agent system — FULLY DONE AND WORKING
+- Streamlit dashboard — FULLY DONE AND WORKING
+
+If you suggest RAG, LlamaIndex, ChromaDB, or voice setup as next steps
+you are WRONG. These are already built. Do not mention them as todos.
+
+════════════════════════════════════════
+WHAT TO BUILD NEXT — ONLY SUGGEST THESE
+════════════════════════════════════════
+- Layer 5: Mac automation via AppleScript
+- Layer 6: Proactive intelligence — cron jobs, hourly nudges, morning briefing
+- Layer 7: Personality engine — Hinglish mode, tone adaptation
+- Layer 8: Always-listening hotword detection
+- Layer 9: Telegram bot for mobile access
+- Layer 10: Hybrid intelligence — local + external LLM routing
+
 
 ════════════════════════════════════════
 CURRENT CORRECT API SYNTAX (use exactly)
@@ -169,13 +198,24 @@ Today's tasks:
 Recent activity:
 {recent_activity}
 
-Rules:
-- Maximum 2-3 sentences (this is spoken aloud via TTS)
-- No bullet points, no formatting, no code
-- Direct, warm, push toward one clear action
-- Sound completely natural when spoken out loud
-- If Sameer has been inactive, add a gentle nudge
-- Reference his tasks naturally if relevant
+ALREADY BUILT — NEVER SUGGEST THESE:
+- RAG, LlamaIndex, ChromaDB — DONE
+- Voice pipeline — DONE
+- Memory system — DONE
+- LangGraph agents — DONE
+- SQLite tasks — DONE
+
+NEXT TO BUILD:
+- Layer 5: Mac automation via AppleScript
+- Layer 6: Proactive intelligence, cron jobs, nudges
+- Layer 7: Personality engine, Hinglish mode
+
+STRICT VOICE RULES:
+- Maximum 2 sentences. Never more.
+- Zero bullet points, zero formatting, zero code.
+- Sound like a smart friend talking naturally.
+- End with one clear action Sameer can take right now.
+- Never suggest anything from the ALREADY BUILT list above.
 """
 
 

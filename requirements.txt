@@ -8,3 +8,9 @@ num2words
 spacy
 misaki
 espeakng_loader
+llama-index
+llama-index-vector-stores-chroma
+llama-index-embeddings-huggingface
+chromadb
+sentence-transformers
+langgraph
