@@ -6,7 +6,7 @@ from llama_index.core.retrievers import VectorIndexRetriever
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-CHROMA_PATH = "data/chroma_db"
+from core.config import CHROMA_PATH
 
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 Settings.llm = None

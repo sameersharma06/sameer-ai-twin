@@ -23,14 +23,16 @@ def detect_intent(text: str) -> str:
         "i don't know", "help me decide", "motivation",
         "focus on", "prioritize", "should i build",
         "what should i build", "where to start",
-        "i am stuck", "feeling lost", "guide me"
+        "i am stuck", "feeling lost", "guide me",
+        "explain the full", "explain my", "describe my",
+        "full architecture", "how does my", "overview of my"
     ]
     research_words = [
-    "what is", "research", "find", "search",
-    "tell me about", "what do my notes", "how does", "summarize",
-    "how do i", "how do you", "what are", "describe",
-    "what do i know", "what do i have", "do i have notes",
-    "what have i learned", "what do my notes say"
+        "what is", "research", "find", "search",
+        "tell me about", "what do my notes", "how does", "summarize",
+        "how do i", "how do you", "what are", "describe",
+        "what do i know", "what do i have", "do i have notes",
+        "what have i learned", "what do my notes say"
     ]
     coding_words = [
         "code", "write a function", "debug", "fix this error",
@@ -40,16 +42,6 @@ def detect_intent(text: str) -> str:
     automation_words = [
         "open", "launch", "automate", "notify",
         "remind", "close app", "start app"
-    ]
-    brain_words = [
-    "what should i", "what to do", "i have time",
-    "free time", "next step", "what's next",
-    "i don't know", "help me decide", "motivation",
-    "focus on", "prioritize", "should i build",
-    "what should i build", "where to start",
-    "i am stuck", "feeling lost", "guide me",
-    "explain the full", "explain my", "describe my",
-    "full architecture", "how does my", "overview of my"
     ]
 
     if any(w in text for w in task_words):
@@ -133,7 +125,6 @@ def build_graph():
     return graph.compile()
 
 
-# Build once at import time
 agent_graph = build_graph()
 
 

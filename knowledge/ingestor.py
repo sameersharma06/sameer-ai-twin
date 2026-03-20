@@ -5,8 +5,7 @@ from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, StorageCon
 from llama_index.vector_stores.chroma import ChromaVectorStore
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-CHROMA_PATH = "data/chroma_db"
-NOTES_PATH  = os.path.expanduser("~/Notes")
+from core.config import CHROMA_PATH, NOTES_PATH
 
 # Fully local — no OpenAI, no internet
 Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")

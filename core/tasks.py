@@ -1,10 +1,10 @@
+# core/tasks.py
 import sqlite3
+from core.config import DB_PATH, DATA_DIR
 import os
 
-DB_PATH = "data/sameer_ai.db"
-
 def _connect():
-    os.makedirs("data", exist_ok=True)
+    os.makedirs(DATA_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
     conn.execute("""
         CREATE TABLE IF NOT EXISTS tasks (
@@ -38,3 +38,4 @@ def mark_done(task_id: int):
     conn.execute("UPDATE tasks SET done = 1 WHERE id = ?", (task_id,))
     conn.commit()
     conn.close()
+    

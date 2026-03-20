@@ -2,13 +2,12 @@
 import sqlite3
 import datetime
 import os
+from core.config import DB_PATH, DATA_DIR
 
-DB_PATH = "data/sameer_ai.db"
 
 def _connect():
-    os.makedirs("data", exist_ok=True)
+    os.makedirs(DATA_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-
     conn.execute("""
         CREATE TABLE IF NOT EXISTS events (
             id        INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,8 +33,6 @@ def _connect():
     conn.commit()
     return conn
 
-
-# ── EVENT LOGGING ──────────────────────────────────────────────────────
 
 def log_event(event_type: str, content: str):
     conn = _connect()
@@ -68,8 +65,6 @@ def get_todays_events() -> list:
     return rows
 
 
-# ── CONTEXT ENGINE ─────────────────────────────────────────────────────
-
 def get_context_summary() -> str:
     now = datetime.datetime.now()
     hour = now.hour
@@ -94,10 +89,10 @@ def get_context_summary() -> str:
         activity_str = "\n".join(lines)
 
     todays = get_todays_events()
-    queries_today  = sum(1 for _, t, _ in todays if t == "query")
-    tasks_created  = sum(1 for _, t, _ in todays if t == "task_created")
-    tasks_done     = sum(1 for _, t, _ in todays if t == "task_completed")
-    voice_used     = sum(1 for _, t, _ in todays if t == "voice_used")
+    queries_today = sum(1 for _, t, _ in todays if t == "query")
+    tasks_created = sum(1 for _, t, _ in todays if t == "task_created")
+    tasks_done    = sum(1 for _, t, _ in todays if t == "task_completed")
+    voice_used    = sum(1 for _, t, _ in todays if t == "voice_used")
 
     return f"""Time: {now.strftime('%A, %d %B %Y — %H:%M')} ({time_context})
 
@@ -111,13 +106,10 @@ Recent events (last 10):
 {activity_str}"""
 
 
-# ── PATTERN DETECTION ──────────────────────────────────────────────────
-
 def detect_patterns() -> list:
     conn = _connect()
     patterns_found = []
 
-    # Delayed tasks — created 3+ days ago, not completed
     old_tasks = conn.execute("""
         SELECT content, timestamp FROM events
         WHERE type = 'task_created'
@@ -135,7 +127,6 @@ def detect_patterns() -> list:
                 f"Delayed task: '{content}' created {ts[:10]} still pending"
             )
 
-    # Most active hour
     peak = conn.execute("""
         SELECT substr(timestamp, 12, 2) as hour, COUNT(*) as cnt
         FROM events WHERE type = 'query'
@@ -146,7 +137,6 @@ def detect_patterns() -> list:
             f"Most active hour: {peak[0]}:00 ({peak[1]} queries)"
         )
 
-    # Voice vs text preference
     voice_count = conn.execute(
         "SELECT COUNT(*) FROM events WHERE type = 'voice_used'"
     ).fetchone()[0]
@@ -162,8 +152,6 @@ def detect_patterns() -> list:
     conn.close()
     return patterns_found
 
-
-# ── DAILY LOG ──────────────────────────────────────────────────────────
 
 def save_log(summary: str, work_hours: float = 0):
     conn = _connect()
@@ -205,5 +193,3 @@ def generate_daily_summary() -> str:
     summary = "\n".join(lines)
     save_log(summary)
     return summary
-
-    
