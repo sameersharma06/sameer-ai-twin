@@ -237,3 +237,25 @@ async def get_insight():
 @app.get("/api/health")
 async def health():
     return {"status": "online", "system": "SAMEER AI TWIN"}
+
+
+# -- proactive end points---------------------------------------------------
+
+@app.get("/api/proactive/briefing")
+async def get_briefing():
+    from core.proactive import get_morning_briefing
+    briefing = get_morning_briefing()
+    return {"briefing": briefing}
+
+@app.get("/api/proactive/nudge")
+async def get_nudge_api():
+    from core.proactive import get_nudge
+    nudge = get_nudge()
+    return {"nudge": nudge, "show": bool(nudge)}
+
+@app.get("/api/proactive/warnings")
+async def get_warnings():
+    from core.proactive import get_deadline_warnings
+    warnings = get_deadline_warnings()
+    return {"warnings": warnings}
+

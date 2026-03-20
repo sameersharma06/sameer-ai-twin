@@ -3,6 +3,90 @@ import axios from "axios"
 
 const API = "http://localhost:8000/api"
 
+
+function ProactivePanel() {
+    const [briefing, setBriefing] = useState("")
+    const [nudge, setNudge] = useState("")
+    const [warnings, setWarnings] = useState([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        const load = async () => {
+            try {
+                const [b, n, w] = await Promise.all([
+                    axios.get(`${API}/proactive/briefing`),
+                    axios.get(`${API}/proactive/nudge`),
+                    axios.get(`${API}/proactive/warnings`),
+                ])
+                setBriefing(b.data.briefing)
+                if (n.data.show) setNudge(n.data.nudge)
+                setWarnings(w.data.warnings)
+            } catch (e) { }
+            setLoading(false)
+        }
+        load()
+    }, [])
+
+    if (loading) return (
+        <div style={{ color: "#4a4a52", fontSize: "13px" }}>Loading...</div>
+    )
+
+    return (
+        <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {warnings.length > 0 && warnings.map((w, i) => (
+                <div key={i} style={{
+                    padding: "12px 16px",
+                    background: "#2a1a1a",
+                    border: "1px solid #ef444430",
+                    borderRadius: "10px",
+                    fontSize: "13px",
+                    color: "#fca5a5",
+                }}>
+                    ⏰ {w}
+                </div>
+            ))}
+
+            {nudge && (
+                <div style={{
+                    padding: "12px 16px",
+                    background: "#1a1a2a",
+                    border: "1px solid #6366f130",
+                    borderRadius: "10px",
+                    fontSize: "13px",
+                    color: "#a5b4fc",
+                }}>
+                    💡 {nudge}
+                </div>
+            )}
+
+            {briefing && (
+                <div style={{
+                    padding: "16px",
+                    background: "#111113",
+                    border: "1px solid #1c1c1e",
+                    borderRadius: "12px",
+                    fontSize: "13.5px",
+                    color: "#d0d0ce",
+                    lineHeight: "1.7",
+                    whiteSpace: "pre-wrap",
+                }}>
+                    <div style={{
+                        fontSize: "11px", color: "#4a4a52",
+                        letterSpacing: "0.06em", textTransform: "uppercase",
+                        marginBottom: "10px"
+                    }}>
+                        Morning Briefing
+                    </div>
+                    {briefing}
+                </div>
+            )}
+        </div>
+    )
+}
+
+
+
+
 export default function App() {
     const [messages, setMessages] = useState([
         {
@@ -318,6 +402,7 @@ export default function App() {
                         { id: "chat", label: "Chat", sub: "Ask anything" },
                         { id: "tasks", label: "Tasks", sub: `${tasks.length} pending` },
                         { id: "memory", label: "Memory", sub: "Patterns & insights" },
+                        { id: "proactive", label: "Proactive", sub: "Briefing & nudges" },
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -351,6 +436,8 @@ export default function App() {
                 </div>
 
                 <div style={{ flex: 1 }} />
+
+
 
                 {/* Bottom stats */}
                 <div style={{
@@ -826,6 +913,24 @@ export default function App() {
                         )}
                     </div>
                 )}
+
+                {/* -- proactive -- */}
+                {activeTab === "proactive" && (
+                    <div style={{ flex: 1, overflowY: "auto", padding: "24px", maxWidth: "720px" }}>
+                        <div style={{ marginBottom: "24px" }}>
+                            <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#e8e8e6", marginBottom: "4px" }}>
+                                Proactive Intelligence
+                            </h2>
+                            <p style={{ fontSize: "12px", color: "#4a4a52" }}>
+                                Morning briefing · Nudges · Deadline warnings
+                            </p>
+                        </div>
+
+                        <ProactivePanel />
+                    </div>
+                )}
+
+
             </div>
 
             <style>{`

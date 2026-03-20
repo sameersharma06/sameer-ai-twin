@@ -6,10 +6,37 @@ from core.tasks import get_tasks, add_task, mark_done
 from core.brain import get_response
 from core.voice import record_audio, transcribe, speak
 from core.memory import log_event, generate_daily_summary, detect_patterns
+from core.proactive import (
+    get_morning_briefing, get_nudge,
+    get_deadline_warnings, should_show_morning_briefing,
+    mark_briefing_shown
+)
+
 
 st.set_page_config(page_title="SAMEER AI TWIN", layout="wide", page_icon="🧠")
 st.title("🧠 SAMEER AI TWIN")
 st.caption("Personal AI OS · 100% Local · Apple Silicon · v2 — Memory + Context Engine")
+
+# ── PROACTIVE INTELLIGENCE ────────────────────────────────────────────
+# Morning briefing — shows once per day automatically
+if should_show_morning_briefing():
+    briefing = get_morning_briefing()
+    st.info(f"🌅 **Morning Briefing**\n\n{briefing}")
+    if st.button("Got it"):
+        mark_briefing_shown()
+        st.rerun()
+    mark_briefing_shown()
+
+# Deadline warnings
+warnings = get_deadline_warnings()
+if warnings:
+    for w in warnings:
+        st.warning(f"⏰ {w}")
+
+# Nudge if inactive
+nudge = get_nudge()
+if nudge:
+    st.info(f"💡 {nudge}")
 
 col1, col2, col3 = st.columns([2, 1.5, 1.5])
 
@@ -123,4 +150,3 @@ if user_text:
     st.caption(f"Agent: {agent_used}")
     st.write("**Sameer AI:**", reply)
 
-    
