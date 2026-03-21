@@ -164,9 +164,14 @@ def get_response(
         tasks=tasks_context if tasks_context else "No tasks added yet.",
         recent_activity=recent_activity
     )
+    
 
     # Inject auto-detected project state
     system_content += get_full_state()
+
+    # Layer 6 — personality engine
+    from core.personality import get_personality_prompt
+    system_content += get_personality_prompt(user_message)
 
     # RAG — only for explicit knowledge questions
     try:
