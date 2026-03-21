@@ -1,3 +1,7 @@
+> ⚠️ This project has moved. The new and improved version is [Zeno](https://github.com/sameersharma06/zeno) — cleaner architecture, better product, actively maintained.
+
+---
+
 # 🧠 SAMEER AI TWIN — Personal AI Operating System
 
 ![Local](https://img.shields.io/badge/100%25_Local-brightgreen)
